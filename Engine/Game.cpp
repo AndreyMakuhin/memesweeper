@@ -21,6 +21,8 @@
 #include "MainWindow.h"
 #include "Game.h"
 
+//это моя ветка теперь...тест
+
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
