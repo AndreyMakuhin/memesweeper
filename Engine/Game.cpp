@@ -29,8 +29,30 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	mineField(20)
+	mineField(50)
 {
+	/*
+	//just for test
+	std::random_device rd;
+	std::mt19937 rng(rd());
+	std::uniform_int_distribution<int> xDistr(0, 19);
+	std::uniform_int_distribution<int> yDistr(0, 15);
+
+	for (int i = 0; i < 220; ++i)
+	{		
+		int index;
+
+		do
+		{
+		Vei2 cell{ xDistr(rng), yDistr(rng) };
+		index = cell.y * 20 + cell.x;
+
+		mineField.ChangeTileState(MineField::TileState::Opened, index);
+
+		} while (mineField.GetTile(index).GetState() != MineField::TileState::Opened);
+	}
+	//just for test
+	*/
 }
 
 void Game::Go()
@@ -43,26 +65,22 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	//just for test
-	std::random_device rd;
-	std::mt19937 rng(rd());
-	std::uniform_int_distribution<int> xDistr(0, 19);
-	std::uniform_int_distribution<int> yDistr(0, 15);
-
-	for (int i = 0; i < 120; ++i)
+	if (wnd.mouse.GetPosX()>=0 && wnd.mouse.GetPosX() < mineField.GetSize().x * SpriteCodex::tileSize &&
+		wnd.mouse.GetPosY() >= 0 && wnd.mouse.GetPosY() < mineField.GetSize().y * SpriteCodex::tileSize)
 	{
-		Vei2 cell{xDistr(rng), yDistr(rng)};
-		int index;
-		do
+		if (wnd.mouse.LeftIsPressed())
 		{
-			Vei2 cell{ xDistr(rng), yDistr(rng) };
-			index = cell.x * 20 + cell.y;
-
-			mineField.ChangeTileState(MineField::TileState::Opened, index);
-
-		} while (mineField.GetTile(index).GetState() != MineField::TileState::Opened);
-	}
-	//just for test
+			if (!mousePressed)
+			{
+				mineField.OnMouseClick(Vei2{ wnd.mouse.GetPosX(), wnd.mouse.GetPosY() });
+				mousePressed = true;
+			}
+		}
+		else
+		{
+			mousePressed = false;
+		}
+	}	
 }
 
 void Game::ComposeFrame()

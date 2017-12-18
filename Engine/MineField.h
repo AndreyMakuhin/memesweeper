@@ -26,6 +26,7 @@ private:
 		bool HasBomb();
 		void Draw(const Vei2& pos, Graphics& gfx);
 		TileState GetState()const;
+		void OnMouseClick();
 	private:
 		bool hasBomb;
 		TileState state;
@@ -33,6 +34,8 @@ private:
 public:	
 	Tile& GetTile(int index);
 	void ChangeTileState(TileState in_state, int index);
+	void OnMouseClick(Vei2& screenPos);
+	Vei2 GetSize()const;
 private:
 	static constexpr int width = 20;
 	static constexpr int height = 16;

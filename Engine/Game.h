@@ -44,5 +44,6 @@ private:
 	/********************************/
 	/*  User Variables              */
 	MineField mineField;
+	bool mousePressed = false;
 	/********************************/
 };

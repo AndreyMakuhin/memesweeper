@@ -34,9 +34,11 @@ void MineField::Tile::Draw(const Vei2& pos, Graphics & gfx)
 		{
 			SpriteCodex::DrawTileBomb(pos, gfx);
 		}
+		break;
 	case TileState::Flaged:
 		SpriteCodex::DrawTileButton(pos, gfx);
 		SpriteCodex::DrawTileFlag(pos, gfx);
+		break;
 	}
 	
 }
@@ -44,6 +46,14 @@ void MineField::Tile::Draw(const Vei2& pos, Graphics & gfx)
 MineField::TileState MineField::Tile::GetState() const
 {
 	return state;
+}
+
+void MineField::Tile::OnMouseClick()
+{
+	if (state == TileState::Hiden)
+	{
+		state = TileState::Opened;
+	}
 }
 
 MineField::MineField(int numBombs)
@@ -64,6 +74,19 @@ MineField::Tile & MineField::GetTile(int index)
 void MineField::ChangeTileState(TileState in_state, int index)
 {
 	field[index].ChangeState(in_state);
+}
+
+void MineField::OnMouseClick(Vei2 & screenPos)
+{
+	const Vei2 gridPos{screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize};
+	const int index = gridPos.y * width + gridPos.x;
+
+	field[index].OnMouseClick();
+}
+
+Vei2 MineField::GetSize() const
+{
+	return Vei2(width, height);
 }
 
 void MineField::SeedBombs(int nBombs)
@@ -94,7 +117,7 @@ void MineField::Draw(Graphics & gfx)
 		for (pos.x = 0; pos.x < width; ++pos.x)
 		{
 			const Vei2 screenPos{ pos.x * SpriteCodex::tileSize, pos.y * SpriteCodex::tileSize };
-			const int i = pos.x * width + pos.y;
+			const int i = pos.y * width + pos.x;
 			field[i].Draw(screenPos, gfx);
 		}
 	}
