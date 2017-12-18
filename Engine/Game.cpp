@@ -22,6 +22,7 @@
 #include "Game.h"
 
 //это моя ветка теперь...тест
+//запаблишил, еще один тест
 
 Game::Game( MainWindow& wnd )
 	:
