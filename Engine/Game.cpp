@@ -20,6 +20,7 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include <random>
 
 //это моя ветка теперь...тест
 //запаблишил, еще один тест
@@ -27,7 +28,8 @@
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+	mineField(20)
 {
 }
 
@@ -41,8 +43,29 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	//just for test
+	std::random_device rd;
+	std::mt19937 rng(rd());
+	std::uniform_int_distribution<int> xDistr(0, 19);
+	std::uniform_int_distribution<int> yDistr(0, 15);
+
+	for (int i = 0; i < 120; ++i)
+	{
+		Vei2 cell{xDistr(rng), yDistr(rng)};
+		int index;
+		do
+		{
+			Vei2 cell{ xDistr(rng), yDistr(rng) };
+			index = cell.x * 20 + cell.y;
+
+			mineField.ChangeTileState(MineField::TileState::Opened, index);
+
+		} while (mineField.GetTile(index).GetState() != MineField::TileState::Opened);
+	}
+	//just for test
 }
 
 void Game::ComposeFrame()
 {
+	mineField.Draw(gfx);
 }

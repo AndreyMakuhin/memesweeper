@@ -23,7 +23,27 @@ bool MineField::Tile::HasBomb()
 
 void MineField::Tile::Draw(const Vei2& pos, Graphics & gfx)
 {
-	SpriteCodex::DrawTileButton(pos, gfx);
+	switch (state)
+	{
+	case TileState::Hiden:
+		SpriteCodex::DrawTileButton(pos, gfx);
+		break;
+	case TileState::Opened:
+		SpriteCodex::DrawTile0(pos, gfx);
+		if (HasBomb())
+		{
+			SpriteCodex::DrawTileBomb(pos, gfx);
+		}
+	case TileState::Flaged:
+		SpriteCodex::DrawTileButton(pos, gfx);
+		SpriteCodex::DrawTileFlag(pos, gfx);
+	}
+	
+}
+
+MineField::TileState MineField::Tile::GetState() const
+{
+	return state;
 }
 
 MineField::MineField(int numBombs)
@@ -34,6 +54,16 @@ MineField::MineField(int numBombs)
 		field[i].ChangeState(TileState::Hiden);
 	}
 	SeedBombs(numBombs);
+}
+
+MineField::Tile & MineField::GetTile(int index)
+{
+	return field[index];
+}
+
+void MineField::ChangeTileState(TileState in_state, int index)
+{
+	field[index].ChangeState(in_state);
 }
 
 void MineField::SeedBombs(int nBombs)
@@ -57,6 +87,8 @@ void MineField::SeedBombs(int nBombs)
 
 void MineField::Draw(Graphics & gfx)
 {
+	gfx.DrawRect(0, 0, width * SpriteCodex::tileSize, height * SpriteCodex::tileSize, SpriteCodex::baseColor);
+	
 	for (Vei2 pos{ 0,0 }; pos.y < height; ++pos.y)
 	{
 		for (pos.x = 0; pos.x < width; ++pos.x)
