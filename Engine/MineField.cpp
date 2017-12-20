@@ -1,5 +1,6 @@
 #include "MineField.h"
 #include <random>
+#include <algorithm>
 
 void MineField::Tile::SetBomb(bool seeding)
 {
@@ -29,7 +30,7 @@ void MineField::Tile::Draw(const Vei2& pos, Graphics & gfx)
 		SpriteCodex::DrawTileButton(pos, gfx);
 		break;
 	case TileState::Opened:
-		SpriteCodex::DrawTile0(pos, gfx);
+		SpriteCodex::DrawTileNumber(pos, neighboursCount, gfx);
 		if (HasBomb())
 		{
 			SpriteCodex::DrawTileBomb(pos, gfx);
@@ -71,6 +72,34 @@ void MineField::Tile::OnFlagedTile()
 	}
 }
 
+void MineField::Tile::SetNeighboursCount(int count)
+{
+	neighboursCount = count;
+}
+
+int MineField::GetNeighborBombs(Vei2& pos)
+{
+	const int xStart = std::max(0, pos.x - 1);
+	const int yStart = std::max(0, pos.y - 1);
+	const int xEnd = std::min(width - 1, pos.x + 1);
+	const int yEnd = std::min(height - 1, pos.y + 1);
+
+	int nCount = 0;
+
+	for (Vei2 tile{ xStart, yStart }; tile.y <= yEnd; tile.y++)
+	{
+		for (tile.x = xStart; tile.x <= xEnd; tile.x++)
+		{
+			if (GetTile(tile).HasBomb())
+			{
+				nCount++;
+			}
+		}
+	}
+
+	return nCount;
+}
+
 MineField::MineField(int numBombs)
 {
 	for (int i = 0; i < width * height; ++i)
@@ -86,18 +115,23 @@ MineField::Tile & MineField::GetTile(int index)
 	return field[index];
 }
 
+MineField::Tile & MineField::GetTile(Vei2 & pos)
+{
+	return field[pos.y*width + pos.x];
+}
+
 void MineField::ChangeTileState(TileState in_state, int index)
 {
 	field[index].ChangeState(in_state);
 }
 
-void MineField::OnMouseClick(Vei2 & screenPos)
-{
-	const Vei2 gridPos{screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize};
-	const int index = gridPos.y * width + gridPos.x;
-
-	//field[index].OnMouseClick();
-}
+//void MineField::OnMouseClick(Vei2 & screenPos)
+//{
+//	const Vei2 gridPos{screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize};
+//	const int index = gridPos.y * width + gridPos.x;
+//
+//	//field[index].OnMouseClick();
+//}
 
 Vei2 MineField::GetSize() const
 {

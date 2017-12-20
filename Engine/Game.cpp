@@ -53,6 +53,14 @@ Game::Game( MainWindow& wnd )
 	}
 	//just for test
 	*/
+	for (Vei2 pos{ 0,0 }; pos.y < mineField.GetSize().y; ++pos.y)
+	{
+		for (pos.x = 0; pos.x < mineField.GetSize().x; ++pos.x)
+		{
+			const Vei2 screenPos{ pos.x * SpriteCodex::tileSize, pos.y * SpriteCodex::tileSize };
+			mineField.GetTile(pos).SetNeighboursCount( mineField.GetNeighborBombs(pos));
+		}
+	}
 }
 
 void Game::Go()

@@ -28,18 +28,22 @@ private:
 		TileState GetState()const;
 		void OnOpenTile();
 		void OnFlagedTile();
+		void SetNeighboursCount(int count);
 	private:
 		bool hasBomb;
 		TileState state;
+		int neighboursCount = -1;
 	};
 public:	
 	Tile& GetTile(int index);
+	Tile& GetTile(Vei2& pos);
 	void ChangeTileState(TileState in_state, int index);
-	void OnMouseClick(Vei2& screenPos);
+	//void OnMouseClick(Vei2& screenPos);
 	Vei2 GetSize()const;
+	int GetNeighborBombs(Vei2& pos);
 private:
 	static constexpr int width = 20;
 	static constexpr int height = 16;
 	Tile field[width * height];
-	void SeedBombs(int nBombs);	
+	void SeedBombs(int nBombs);		
 };
