@@ -26,7 +26,8 @@ private:
 		bool HasBomb();
 		void Draw(const Vei2& pos, Graphics& gfx);
 		TileState GetState()const;
-		void OnMouseClick();
+		void OnOpenTile();
+		void OnFlagedTile();
 	private:
 		bool hasBomb;
 		TileState state;

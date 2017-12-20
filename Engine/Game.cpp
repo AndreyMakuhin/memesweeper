@@ -68,18 +68,21 @@ void Game::UpdateModel()
 	if (wnd.mouse.GetPosX()>=0 && wnd.mouse.GetPosX() < mineField.GetSize().x * SpriteCodex::tileSize &&
 		wnd.mouse.GetPosY() >= 0 && wnd.mouse.GetPosY() < mineField.GetSize().y * SpriteCodex::tileSize)
 	{
-		if (wnd.mouse.LeftIsPressed())
+		while (!wnd.mouse.IsEmpty())
 		{
-			if (!mousePressed)
+			const Mouse::Event e = wnd.mouse.Read();
+			const Vei2 gridPos{e.GetPosX()/SpriteCodex::tileSize, e.GetPosY()/SpriteCodex::tileSize};
+
+			if (e.GetType() == Mouse::Event::Type::LPress)
 			{
-				mineField.OnMouseClick(Vei2{ wnd.mouse.GetPosX(), wnd.mouse.GetPosY() });
-				mousePressed = true;
+				//mineField.OnMouseClick(Vei2{ e.GetPosX(), e.GetPosY() });
+				mineField.GetTile(gridPos.y * mineField.GetSize().x + gridPos.x).OnOpenTile();
 			}
-		}
-		else
-		{
-			mousePressed = false;
-		}
+			else if (e.GetType() == Mouse::Event::Type::RPress)
+			{
+				mineField.GetTile(gridPos.y * mineField.GetSize().x + gridPos.x).OnFlagedTile();
+			}
+		}		
 	}	
 }
 

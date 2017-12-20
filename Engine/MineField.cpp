@@ -48,11 +48,26 @@ MineField::TileState MineField::Tile::GetState() const
 	return state;
 }
 
-void MineField::Tile::OnMouseClick()
+void MineField::Tile::OnOpenTile()
 {
 	if (state == TileState::Hiden)
 	{
 		state = TileState::Opened;
+	}
+}
+
+void MineField::Tile::OnFlagedTile()
+{
+	if (state != TileState::Opened)
+	{
+		if (state == TileState::Flaged)
+		{
+			state = TileState::Hiden;
+		}
+		else
+		{
+			state = TileState::Flaged;
+		}
 	}
 }
 
@@ -81,7 +96,7 @@ void MineField::OnMouseClick(Vei2 & screenPos)
 	const Vei2 gridPos{screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize};
 	const int index = gridPos.y * width + gridPos.x;
 
-	field[index].OnMouseClick();
+	//field[index].OnMouseClick();
 }
 
 Vei2 MineField::GetSize() const
