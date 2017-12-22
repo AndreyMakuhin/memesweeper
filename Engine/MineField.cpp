@@ -46,7 +46,42 @@ void MineField::Tile::Draw(const Vei2& pos, bool fucked, Graphics & gfx)
 	}
 	else
 	{
-
+		switch (state)
+		{
+		case TileState::Hiden:
+			if (HasBomb())
+			{
+				SpriteCodex::DrawTileBomb(pos, gfx);
+			}
+			else
+			{
+				SpriteCodex::DrawTileButton(pos, gfx);
+			}
+			break;
+		case TileState::Opened:
+			if (HasBomb())
+			{
+				SpriteCodex::DrawTileBombRed(pos, gfx);				
+			}
+			else
+			{
+				SpriteCodex::DrawTileNumber(pos, neighboursCount, gfx);
+			}			
+			break;
+		case TileState::Flaged:
+			if (HasBomb())
+			{
+				SpriteCodex::DrawTileButton(pos, gfx);
+				SpriteCodex::DrawTileFlag(pos, gfx);
+				SpriteCodex::DrawTileCross(pos, gfx);
+			}
+			else
+			{
+				SpriteCodex::DrawTileBomb(pos, gfx);
+				SpriteCodex::DrawTileFlag(pos, gfx);
+			}			
+			break;
+		}
 	}	
 }
 
@@ -55,12 +90,16 @@ MineField::TileState MineField::Tile::GetState() const
 	return state;
 }
 
-void MineField::Tile::OpenTile()
+bool MineField::Tile::OpenTile()
 {
 	if (state == TileState::Hiden)
-	{
+	{		
 		state = TileState::Opened;
+		
+		return HasBomb();		
 	}
+
+	return false;
 }
 
 void MineField::Tile::FlagedTile()
@@ -138,20 +177,30 @@ void MineField::ChangeTileState(TileState in_state, int index)
 
 void MineField::OnRevealClick(Vei2 & screenPos)
 {
-	Vei2 gridPos{screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize};
-	
-	Tile& tile = GetTile(gridPos);
+	if (!isFucked)
+	{
+		Vei2 gridPos{ screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize };
 
-	tile.OpenTile();
+		Tile& tile = GetTile(gridPos);
+
+		if (tile.OpenTile())
+		{
+			isFucked = true;
+		}
+	}
+	
 }
 
 void MineField::OnFlagClick(Vei2 & screenPos)
 {
-	Vei2 gridPos{ screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize };
-	
-	Tile& tile = GetTile(gridPos);
-	
-	tile.FlagedTile();
+	if (!isFucked)
+	{
+		Vei2 gridPos{ screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize };
+
+		Tile& tile = GetTile(gridPos);
+
+		tile.FlagedTile();
+	}
 
 }
 

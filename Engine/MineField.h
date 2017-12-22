@@ -26,7 +26,7 @@ private:
 		bool HasBomb();
 		void Draw(const Vei2& pos, bool fucked, Graphics& gfx);
 		TileState GetState()const;
-		void OpenTile();
+		bool OpenTile();
 		void FlagedTile();
 		void SetNeighboursCount(int count);
 	private:
