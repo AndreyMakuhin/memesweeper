@@ -22,26 +22,32 @@ bool MineField::Tile::HasBomb()
 	return hasBomb;
 }
 
-void MineField::Tile::Draw(const Vei2& pos, Graphics & gfx)
+void MineField::Tile::Draw(const Vei2& pos, bool fucked, Graphics & gfx)
 {
-	switch (state)
+	if (!fucked)
 	{
-	case TileState::Hiden:
-		SpriteCodex::DrawTileButton(pos, gfx);
-		break;
-	case TileState::Opened:
-		SpriteCodex::DrawTileNumber(pos, neighboursCount, gfx);
-		if (HasBomb())
+		switch (state)
 		{
-			SpriteCodex::DrawTileBomb(pos, gfx);
+		case TileState::Hiden:
+			SpriteCodex::DrawTileButton(pos, gfx);
+			break;
+		case TileState::Opened:
+			SpriteCodex::DrawTileNumber(pos, neighboursCount, gfx);
+			if (HasBomb())
+			{
+				SpriteCodex::DrawTileBomb(pos, gfx);
+			}
+			break;
+		case TileState::Flaged:
+			SpriteCodex::DrawTileButton(pos, gfx);
+			SpriteCodex::DrawTileFlag(pos, gfx);
+			break;
 		}
-		break;
-	case TileState::Flaged:
-		SpriteCodex::DrawTileButton(pos, gfx);
-		SpriteCodex::DrawTileFlag(pos, gfx);
-		break;
 	}
-	
+	else
+	{
+
+	}	
 }
 
 MineField::TileState MineField::Tile::GetState() const
@@ -49,7 +55,7 @@ MineField::TileState MineField::Tile::GetState() const
 	return state;
 }
 
-void MineField::Tile::OnOpenTile()
+void MineField::Tile::OpenTile()
 {
 	if (state == TileState::Hiden)
 	{
@@ -57,7 +63,7 @@ void MineField::Tile::OnOpenTile()
 	}
 }
 
-void MineField::Tile::OnFlagedTile()
+void MineField::Tile::FlagedTile()
 {
 	if (state != TileState::Opened)
 	{
@@ -100,6 +106,11 @@ int MineField::GetNeighborBombs(Vei2& pos)
 	return nCount;
 }
 
+bool MineField::IsFucked() const
+{
+	return isFucked;
+}
+
 MineField::MineField(int numBombs)
 {
 	for (int i = 0; i < width * height; ++i)
@@ -125,13 +136,24 @@ void MineField::ChangeTileState(TileState in_state, int index)
 	field[index].ChangeState(in_state);
 }
 
-//void MineField::OnMouseClick(Vei2 & screenPos)
-//{
-//	const Vei2 gridPos{screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize};
-//	const int index = gridPos.y * width + gridPos.x;
-//
-//	//field[index].OnMouseClick();
-//}
+void MineField::OnRevealClick(Vei2 & screenPos)
+{
+	Vei2 gridPos{screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize};
+	
+	Tile& tile = GetTile(gridPos);
+
+	tile.OpenTile();
+}
+
+void MineField::OnFlagClick(Vei2 & screenPos)
+{
+	Vei2 gridPos{ screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize };
+	
+	Tile& tile = GetTile(gridPos);
+	
+	tile.FlagedTile();
+
+}
 
 Vei2 MineField::GetSize() const
 {
@@ -167,7 +189,7 @@ void MineField::Draw(Graphics & gfx)
 		{
 			const Vei2 screenPos{ pos.x * SpriteCodex::tileSize, pos.y * SpriteCodex::tileSize };
 			const int i = pos.y * width + pos.x;
-			field[i].Draw(screenPos, gfx);
+			field[i].Draw(screenPos, isFucked, gfx);
 		}
 	}
 }

@@ -84,11 +84,11 @@ void Game::UpdateModel()
 			if (e.GetType() == Mouse::Event::Type::LPress)
 			{
 				//mineField.OnMouseClick(Vei2{ e.GetPosX(), e.GetPosY() });
-				mineField.GetTile(gridPos.y * mineField.GetSize().x + gridPos.x).OnOpenTile();
+				mineField.OnRevealClick(Vei2{ e.GetPosX(), e.GetPosY() });
 			}
 			else if (e.GetType() == Mouse::Event::Type::RPress)
 			{
-				mineField.GetTile(gridPos.y * mineField.GetSize().x + gridPos.x).OnFlagedTile();
+				mineField.OnFlagClick(Vei2{ e.GetPosX(), e.GetPosY() });
 			}
 		}		
 	}	
