@@ -94,7 +94,7 @@ bool MineField::Tile::OpenTile()
 {
 	if (state == TileState::Hiden)
 	{		
-		state = TileState::Opened;
+		state = TileState::Opened;		
 		
 		return HasBomb();		
 	}
@@ -158,6 +158,7 @@ MineField::MineField(int numBombs)
 		field[i].ChangeState(TileState::Hiden);
 	}
 	SeedBombs(numBombs);
+	bombsCount = numBombs;
 }
 
 MineField::Tile & MineField::GetTile(int index)
@@ -177,7 +178,7 @@ void MineField::ChangeTileState(TileState in_state, int index)
 
 void MineField::OnRevealClick(Vei2 & screenPos)
 {
-	if (!isFucked)
+	if (!isFucked && !isWin)
 	{
 		Vei2 gridPos{ screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize };
 
@@ -187,13 +188,17 @@ void MineField::OnRevealClick(Vei2 & screenPos)
 		{
 			isFucked = true;
 		}
+		else
+		{
+			ChekWin();
+		}
 	}
 	
 }
 
 void MineField::OnFlagClick(Vei2 & screenPos)
 {
-	if (!isFucked)
+	if (!isFucked && !isWin)
 	{
 		Vei2 gridPos{ screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize };
 
@@ -226,6 +231,15 @@ void MineField::SeedBombs(int nBombs)
 
 		field[a].BombSeeding();
 	}
+}
+
+void MineField::ChekWin()
+{
+	if (hiddenTiles == bombsCount)
+	{
+		isWin = true;
+	}
+
 }
 
 void MineField::Draw(Graphics & gfx)

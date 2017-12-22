@@ -46,7 +46,11 @@ public:
 private:
 	static constexpr int width = 20;
 	static constexpr int height = 16;
+	int hiddenTiles = width * height;
 	Tile field[width * height];
 	void SeedBombs(int nBombs);	
 	bool isFucked = false;
+	bool isWin = false;
+	void ChekWin();
+	int bombsCount;
 };
