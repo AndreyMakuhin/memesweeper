@@ -69,7 +69,7 @@ void MineField::Tile::Draw(const Vei2& pos, bool fucked, Graphics & gfx)
 			}			
 			break;
 		case TileState::Flaged:
-			if (HasBomb())
+			if (!HasBomb())
 			{
 				SpriteCodex::DrawTileButton(pos, gfx);
 				SpriteCodex::DrawTileFlag(pos, gfx);
@@ -102,6 +102,11 @@ bool MineField::Tile::OpenTile()
 	return false;
 }
 
+bool MineField::Tile::IsRevealed()
+{
+	return state==TileState::Opened;
+}
+
 void MineField::Tile::FlagedTile()
 {
 	if (state != TileState::Opened)
@@ -121,6 +126,8 @@ void MineField::Tile::SetNeighboursCount(int count)
 {
 	neighboursCount = count;
 }
+
+
 
 int MineField::GetNeighborBombs(Vei2& pos)
 {
@@ -181,19 +188,40 @@ void MineField::OnRevealClick(Vei2 & screenPos)
 	if (!isFucked && !isWin)
 	{
 		Vei2 gridPos{ screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize };
-
-		Tile& tile = GetTile(gridPos);
-
-		if (tile.OpenTile())
-		{
-			isFucked = true;
-		}
-		else
-		{
-			ChekWin();
-		}
+		RevealTile(gridPos);
+		
 	}
 	
+}
+
+void MineField::RevealTile(Vei2 & gridPos)
+{
+	Tile& tile = GetTile(gridPos);
+
+	if (tile.OpenTile())
+	{
+		isFucked = true;
+	}
+	else if(HasNoNeighbours(gridPos))
+	{
+		const int xStart = std::max(0, gridPos.x - 1);
+		const int yStart = std::max(0, gridPos.y - 1);
+		const int xEnd = std::min(width - 1, gridPos.x + 1);
+		const int yEnd = std::min(height - 1, gridPos.y + 1);			
+
+		for (Vei2 tile{ xStart, yStart }; tile.y <= yEnd; tile.y++)
+		{
+			for (tile.x = xStart; tile.x <= xEnd; tile.x++)
+			{	
+				if (!GetTile(tile).IsRevealed())
+				{
+					ChekWin();
+					hiddenTiles--;
+					RevealTile(tile);
+				}				
+			}
+		}
+	}
 }
 
 void MineField::OnFlagClick(Vei2 & screenPos)
@@ -255,4 +283,24 @@ void MineField::Draw(Graphics & gfx)
 			field[i].Draw(screenPos, isFucked, gfx);
 		}
 	}
+}
+
+bool MineField::HasNoNeighbours(Vei2& pos)
+{
+	const int xStart = std::max(0, pos.x - 1);
+	const int yStart = std::max(0, pos.y - 1);
+	const int xEnd = std::min(width - 1, pos.x + 1);
+	const int yEnd = std::min(height - 1, pos.y + 1);
+	
+	for (Vei2 tile{ xStart, yStart }; tile.y <= yEnd; tile.y++)
+	{
+		for (tile.x = xStart; tile.x <= xEnd; tile.x++)
+		{			
+			if (GetTile(tile).HasBomb())
+			{
+				return false;
+			}
+		}
+	}
+	return true;
 }

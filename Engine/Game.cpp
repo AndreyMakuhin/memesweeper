@@ -29,7 +29,7 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	mineField(50)
+	mineField(10)
 {
 	/*
 	//just for test
