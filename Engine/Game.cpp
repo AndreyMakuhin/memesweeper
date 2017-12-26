@@ -29,7 +29,7 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	mineField(10)
+	mineField(30, gfx)
 {
 	/*
 	//just for test
@@ -56,8 +56,7 @@ Game::Game( MainWindow& wnd )
 	for (Vei2 pos{ 0,0 }; pos.y < mineField.GetSize().y; ++pos.y)
 	{
 		for (pos.x = 0; pos.x < mineField.GetSize().x; ++pos.x)
-		{
-			const Vei2 screenPos{ pos.x * SpriteCodex::tileSize, pos.y * SpriteCodex::tileSize };
+		{			
 			mineField.GetTile(pos).SetNeighboursCount( mineField.GetNeighborBombs(pos));
 		}
 	}
@@ -73,22 +72,21 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	if (wnd.mouse.GetPosX()>=0 && wnd.mouse.GetPosX() < mineField.GetSize().x * SpriteCodex::tileSize &&
-		wnd.mouse.GetPosY() >= 0 && wnd.mouse.GetPosY() < mineField.GetSize().y * SpriteCodex::tileSize)
+	if (wnd.mouse.GetPosX()>= mineField.startPoint.x && wnd.mouse.GetPosX() < mineField.GetSize().x * SpriteCodex::tileSize + mineField.startPoint.x &&
+		wnd.mouse.GetPosY() >= mineField.startPoint.y && wnd.mouse.GetPosY() < mineField.GetSize().y * SpriteCodex::tileSize + mineField.startPoint.y)
 	{
 		while (!wnd.mouse.IsEmpty())
 		{
 			const Mouse::Event e = wnd.mouse.Read();
-			const Vei2 gridPos{e.GetPosX()/SpriteCodex::tileSize, e.GetPosY()/SpriteCodex::tileSize};
+			Vei2 rawPos{ e.GetPosX(), e.GetPosY()};			
 
 			if (e.GetType() == Mouse::Event::Type::LPress)
-			{
-				//mineField.OnMouseClick(Vei2{ e.GetPosX(), e.GetPosY() });
-				mineField.OnRevealClick(Vei2{ e.GetPosX(), e.GetPosY() });
+			{				
+				mineField.OnRevealClick(rawPos);
 			}
 			else if (e.GetType() == Mouse::Event::Type::RPress)
 			{
-				mineField.OnFlagClick(Vei2{ e.GetPosX(), e.GetPosY() });
+				mineField.OnFlagClick(rawPos);
 			}
 		}		
 	}	

@@ -157,8 +157,11 @@ bool MineField::IsFucked() const
 	return isFucked;
 }
 
-MineField::MineField(int numBombs)
+MineField::MineField(int numBombs, Graphics& gfx)
+	:
+	startPoint(gfx.ScreenWidth/2 - width*SpriteCodex::tileSize/2, gfx.ScreenHeight/2 - height*SpriteCodex::tileSize / 2)
 {
+	
 	for (int i = 0; i < width * height; ++i)
 	{
 		field[i].SetBomb(false);
@@ -185,9 +188,11 @@ void MineField::ChangeTileState(TileState in_state, int index)
 
 void MineField::OnRevealClick(Vei2 & screenPos)
 {
+	Vei2 pos{ screenPos.x - startPoint.x, screenPos.y - startPoint.y };
+
 	if (!isFucked && !isWin)
 	{
-		Vei2 gridPos{ screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize };
+		Vei2 gridPos{ (pos.x) / SpriteCodex::tileSize  , (pos.y) / SpriteCodex::tileSize };
 		RevealTile(gridPos);
 		
 	}
@@ -226,6 +231,8 @@ void MineField::RevealTile(Vei2 & gridPos)
 
 void MineField::OnFlagClick(Vei2 & screenPos)
 {
+	screenPos -= startPoint;
+
 	if (!isFucked && !isWin)
 	{
 		Vei2 gridPos{ screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize };
@@ -271,14 +278,14 @@ void MineField::ChekWin()
 }
 
 void MineField::Draw(Graphics & gfx)
-{
-	gfx.DrawRect(0, 0, width * SpriteCodex::tileSize, height * SpriteCodex::tileSize, SpriteCodex::baseColor);
+{	
+	gfx.DrawRect(startPoint.x, startPoint.y, startPoint.x + width * SpriteCodex::tileSize, startPoint.y + height * SpriteCodex::tileSize, SpriteCodex::baseColor);
 	
-	for (Vei2 pos{ 0,0 }; pos.y < height; ++pos.y)
+	for (Vei2 pos{ 0, 0 }; pos.y < height; ++pos.y)
 	{
 		for (pos.x = 0; pos.x < width; ++pos.x)
 		{
-			const Vei2 screenPos{ pos.x * SpriteCodex::tileSize, pos.y * SpriteCodex::tileSize };
+			const Vei2 screenPos{ startPoint.x + pos.x * SpriteCodex::tileSize, startPoint.y + pos.y * SpriteCodex::tileSize };
 			const int i = pos.y * width + pos.x;
 			field[i].Draw(screenPos, isFucked, gfx);
 		}
@@ -303,4 +310,9 @@ bool MineField::HasNoNeighbours(Vei2& pos)
 		}
 	}
 	return true;
+}
+
+Vei2 MineField::ToGridPos(Vei2 & screenPos)
+{
+	return Vei2(screenPos.x / SpriteCodex::tileSize, screenPos.y / SpriteCodex::tileSize);
 }

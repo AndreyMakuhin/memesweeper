@@ -7,7 +7,7 @@
 class MineField
 {
 public:
-	MineField(int numBombs);
+	MineField(int numBombs, Graphics& gfx);
 	void Draw(Graphics& gfx);	
 public:
 	enum class TileState
@@ -47,6 +47,8 @@ public:
 	int GetNeighborBombs(Vei2& pos);
 	bool IsFucked()const;
 	bool HasNoNeighbours(Vei2& pos);
+	Vei2 ToGridPos(Vei2& screenPos);
+	Vei2 startPoint;
 private:
 	static constexpr int width = 16;
 	static constexpr int height = 16;
@@ -56,5 +58,5 @@ private:
 	bool isFucked = false;
 	bool isWin = false;
 	void ChekWin();
-	int bombsCount;
+	int bombsCount;	
 };

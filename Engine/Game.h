@@ -1,3 +1,4 @@
+
 /****************************************************************************************** 
  *	Chili DirectX Framework Version 16.07.20											  *	
  *	Game.h																				  *
@@ -43,7 +44,7 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-	MineField mineField;
+	MineField mineField;	
 	
 	/********************************/
 };
